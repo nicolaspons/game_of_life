@@ -15,11 +15,13 @@ for (var i = 0; i < size; ++i) {
     }
 }
 
+/*
 tab[50][50] = 1;
 tab[0][0] = 1;
 tab[0][1] = 1;
+tab[99][99] = 1;
 tab[39, 92] = 1;
-
+*/
 
 var x = "black",
     y = 10;
@@ -45,19 +47,41 @@ function start() {
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 1;
 
-    for (var i = 0; i < size; i += 10) {
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, size);
-        ctx.stroke();
-
-        ctx.moveTo(0, i);
-        ctx.lineTo(size, i);
-        ctx.stroke();
-    }
+    draw_grid();
 
     //fill the tab
     fill(10);
     draw_tab();
+
+    play();
+}
+
+// Clear the canvas for redrawing
+function clear() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+}
+
+function play() {
+    console.log("salut mec");
+    clear();
+    draw_tab();
+    /*
+    wait(5000);
+
+    console.log("salut mec");
+    clear();
+    draw_tab();
+    wait(5000);
+    */
+}
+
+function wait(ms) {
+    var start = new Date().getTime();
+    var end = start;
+    while (end < start + ms) {
+        end = new Date().getTime();
+    }
 }
 
 function getRandomInt(max) {
@@ -68,7 +92,6 @@ function fill_rec(i, j, n) {
     if (n == 4 || i < 0 || j < 0 || i >= size || j >= size) {
         return;
     }
-    console.log(i + " " + j);
     tab[i][j] = 1;
     var where = getRandomInt(8);
     switch (where) {
@@ -107,11 +130,22 @@ function fill(nb) {
     }
 }
 
+function draw_grid() {
+    for (var i = 0; i < size; i += 10) {
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, size);
+        ctx.stroke();
+
+        ctx.moveTo(0, i);
+        ctx.lineTo(size, i);
+        ctx.stroke();
+    }
+}
+
 function draw_tab() {
     for (var i = 0; i < size; ++i) {
         for (var j = 0; j < size; ++j) {
             if (tab[i][j] == 1) {
-                console.log(i + " " + j);
                 ctx.beginPath();
                 ctx.moveTo(i * 10, j * 10 + y / 2);
                 ctx.lineTo(i * 10 + 10, j * 10 + y / 2);
