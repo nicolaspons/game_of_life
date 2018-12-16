@@ -1,2 +1,3 @@
 - use requestAnimationFrame(update) inside the update function
 to notify the web browser that I'll execute an animation
+- use for example "height: 90vh" to resize the canvas
