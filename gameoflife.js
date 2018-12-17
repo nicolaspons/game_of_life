@@ -1,98 +1,111 @@
-var canvas, ctx, flag = false;
-var prevX = 0;
-var currX = 0;
-var prevY = 0;
-var currY = 0;
-var dot_flag = false;
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+const size = canvas.width / 10
+let arena = createMatrix(size, size);
+context.scale(10, 10);
 
-var size = 1000; //canvas.height;
-
-var tab = new Array(size);
-for (var i = 0; i < size; ++i) {
-    tab[i] = new Array(size);
-    for (var j = 0; j < size; ++j) {
-        tab[i][j] = 0;
-    }
-}
-
-/*
-tab[50][50] = 1;
-tab[0][0] = 1;
-tab[0][1] = 1;
-tab[99][99] = 1;
-tab[39, 92] = 1;
-*/
-
-var x = "black",
-    y = 10;
-
-function start() {
-    canvas = document.getElementById('canvas');
-    ctx = canvas.getContext('2d');
-
-    canvas.addEventListener("mousemove", function(e) {
-        findxy('move', e)
-    }, false);
-    canvas.addEventListener("mousedown", function(e) {
-        findxy('down', e)
-    }, false);
-    canvas.addEventListener("mouseup", function(e) {
-        findxy('up', e)
-    }, false);
-    canvas.addEventListener("mouseout", function(e) {
-        findxy('out', e)
-    }, false);
-
-
-    ctx.strokeStyle = 'black';
-    ctx.lineWidth = 1;
-
-    draw_grid();
-
-    //fill the tab
+function gameReset() {
+    arena = createMatrix(size, size);
     fill(10);
-    draw_tab();
-
-    play();
+    console.log(arena);
+    console.table(arena);
 }
 
-// Clear the canvas for redrawing
-function clear() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+function gameDrop() {
+    var new_arena = createMatrix(size, size);
+    arena.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (arena[y][x] === 0 && is_alive(x, y)) {
+                new_arena[y][x] = 1;
+            } else if (arena[y][x] !== 0) {
+                new_arena[y][x] = is_dead(x, y) ? 1 : 0;
+            }
+        });
+    });
+    //console.log(new_arena);
+    //console.table(new_arena);
+    arena = new_arena;
 }
 
-function play() {
-    console.log("salut mec");
-    clear();
-    draw_tab();
-    /*
-    wait(5000);
-
-    console.log("salut mec");
-    clear();
-    draw_tab();
-    wait(5000);
-    */
-}
-
-function wait(ms) {
-    var start = new Date().getTime();
-    var end = start;
-    while (end < start + ms) {
-        end = new Date().getTime();
+function is_dead(x, y) {
+    let count = 0;
+    for (let x2 = x - 1; x2 <= x + 1; ++x2) {
+        if (x2 >= 0 && x2 < size) {
+            if (y - 1 >= 0 && arena[y - 1][x2] !== 0) {
+                count++;
+            }
+            if (arena[y][x2] !== 0 && x2 !== x) {
+                count++;
+            }
+            if (y + 1 < size && arena[y + 1][x2] !== 0) {
+                count++;
+            }
+        }
     }
+    return count === 3 || count === 2;
 }
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
+function is_alive(x, y) {
+    let count = 0;
+    for (let x2 = x - 1; x2 <= x + 1; ++x2) {
+        if (x2 >= 0 && x2 < size) {
+            if (y - 1 >= 0 && arena[y - 1][x2] !== 0) {
+                count++;
+            }
+            if (arena[y][x2] !== 0 && x2 !== x) {
+                count++;
+            }
+            if (y + 1 < size && arena[y + 1][x2] !== 0) {
+                count++;
+            }
+        }
+    }
+    return count === 3;
+}
+
+function createMatrix(w, h) {
+    const matrix = [];
+    while (h--) {
+        matrix.push(new Array(w).fill(0));
+    }
+    return matrix;
+}
+
+function draw() {
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    arena.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value !== 0) {
+                context.fillStyle = 'black';
+                context.fillRect(x, y, 1, 1);
+            }
+        });
+    });
+}
+
+let dropCounter = 0;
+let dropInterval = 1000;
+let lastTime = 0;
+
+function update(time = 0) {
+    const deltaTime = time - lastTime;
+    lastTime = time;
+    dropCounter += deltaTime;
+    if (dropCounter > dropInterval) {
+        gameDrop();
+        draw();
+        dropCounter = 0;
+    }
+    requestAnimationFrame(update);
 }
 
 function fill_rec(i, j, n) {
     if (n == 4 || i < 0 || j < 0 || i >= size || j >= size) {
         return;
     }
-    tab[i][j] = 1;
+    arena[i][j] = 1;
     var where = getRandomInt(8);
     switch (where) {
         case 0:
@@ -122,79 +135,18 @@ function fill_rec(i, j, n) {
     }
 }
 
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+}
+
 function fill(nb) {
     var i = 0;
     while (i < nb) {
-        fill_rec(getRandomInt(100), getRandomInt(100), 0);
+        fill_rec(getRandomInt(size), getRandomInt(size), 0);
         ++i;
     }
 }
 
-function draw_grid() {
-    for (var i = 0; i < size; i += 10) {
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, size);
-        ctx.stroke();
+gameReset();
 
-        ctx.moveTo(0, i);
-        ctx.lineTo(size, i);
-        ctx.stroke();
-    }
-}
-
-function draw_tab() {
-    for (var i = 0; i < size; ++i) {
-        for (var j = 0; j < size; ++j) {
-            if (tab[i][j] == 1) {
-                ctx.beginPath();
-                ctx.moveTo(i * 10, j * 10 + y / 2);
-                ctx.lineTo(i * 10 + 10, j * 10 + y / 2);
-                ctx.strokeStyle = x;
-                ctx.lineWidth = y;
-                ctx.stroke();
-                ctx.closePath();
-            }
-        }
-    }
-}
-
-function draw() {
-    ctx.beginPath();
-    ctx.moveTo(prevX, prevY);
-    ctx.lineTo(currX, currY);
-    ctx.strokeStyle = x;
-    ctx.lineWidth = y;
-    ctx.stroke();
-    ctx.closePath();
-}
-
-function findxy(res, e) {
-    if (res == 'down') {
-        prevX = currX;
-        prevY = currY;
-        currX = e.clientX - canvas.offsetLeft;
-        currY = e.clientY - canvas.offsetTop;
-
-        flag = true;
-        dot_flag = true;
-        if (dot_flag) {
-            ctx.beginPath();
-            ctx.fillStyle = x;
-            ctx.fillRect(currX, currY, 10, 10);
-            ctx.closePath();
-            dot_flag = false;
-        }
-    }
-    if (res == 'up' || res == "out") {
-        flag = false;
-    }
-    if (res == 'move') {
-        if (flag) {
-            prevX = currX;
-            prevY = currY;
-            currX = e.clientX - canvas.offsetLeft;
-            currY = e.clientY - canvas.offsetTop;
-            draw();
-        }
-    }
-}
+update();
