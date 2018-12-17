@@ -7,8 +7,6 @@ context.scale(10, 10);
 function gameReset() {
     arena = createMatrix(size, size);
     fill(10);
-    console.log(arena);
-    console.table(arena);
 }
 
 function gameDrop() {
@@ -22,8 +20,6 @@ function gameDrop() {
             }
         });
     });
-    //console.log(new_arena);
-    //console.table(new_arena);
     arena = new_arena;
 }
 
@@ -148,5 +144,4 @@ function fill(nb) {
 }
 
 gameReset();
-
 update();
