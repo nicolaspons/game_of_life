@@ -1,14 +1,27 @@
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
-const size = canvas.width / 10
-let arena = createMatrix(size, size);
-context.scale(10, 10);
+const scale = 5
+const size = canvas.width / scale
 
+let steps = 0;
+let nb_of_cells = 10;
+const nb_of_oc = 10;
+let arena = createMatrix(size, size);
+context.scale(scale, scale);
+
+/*
+ * Reset the matrix of cells and fill it again
+ */
 function gameReset() {
     arena = createMatrix(size, size);
-    fill(10);
+    fill(nb_of_cells);
 }
 
+/*
+ * Update the current matrix with the game of life's rules:
+ * A current cell'll live if his neighbors are 3 or 2.
+ * A cell will spawn if his neighbors are 3.
+ */
 function gameDrop() {
     var new_arena = createMatrix(size, size);
     arena.forEach((row, y) => {
@@ -20,9 +33,16 @@ function gameDrop() {
             }
         });
     });
+    steps++;
     arena = new_arena;
 }
 
+/**
+ * Boolean function => Check if a cell can live or not
+ * It depends on the number of his neighbors (only 2 or 3)
+ * @param {position x of the cell} x 
+ * @param {position y of the cell} y 
+ */
 function is_dead(x, y) {
     let count = 0;
     for (let x2 = x - 1; x2 <= x + 1; ++x2) {
@@ -41,6 +61,12 @@ function is_dead(x, y) {
     return count === 3 || count === 2;
 }
 
+/**
+ * Boolean function => Check if a cell'll spawn
+ * It depends on the number of his neighbors (only 3)
+ * @param {position x of the cell} x 
+ * @param {position y of the cell} y 
+ */
 function is_alive(x, y) {
     let count = 0;
     for (let x2 = x - 1; x2 <= x + 1; ++x2) {
@@ -59,6 +85,11 @@ function is_alive(x, y) {
     return count === 3;
 }
 
+/**
+ * Simple way to create and fill a matrix of 0.
+ * @param {width} w 
+ * @param {height} h 
+ */
 function createMatrix(w, h) {
     const matrix = [];
     while (h--) {
@@ -67,6 +98,9 @@ function createMatrix(w, h) {
     return matrix;
 }
 
+/**
+ * Draw a white board, then for each cell, draw a black square
+ */
 function draw() {
     context.fillStyle = 'white';
     context.fillRect(0, 0, canvas.width, canvas.height);
@@ -79,12 +113,16 @@ function draw() {
             }
         });
     });
+    document.getElementById('steps').innerHTML = steps;
 }
 
 let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
 
+/**
+ * Update the game every second
+ */
 function update(time = 0) {
     const deltaTime = time - lastTime;
     lastTime = time;
@@ -97,8 +135,14 @@ function update(time = 0) {
     requestAnimationFrame(update);
 }
 
+/**
+ * Grow randomly the cells
+ * @param {position y} i 
+ * @param {position x} j 
+ * @param {number of occurence} n 
+ */
 function fill_rec(i, j, n) {
-    if (n == 4 || i < 0 || j < 0 || i >= size || j >= size) {
+    if (n == nb_of_oc || i < 0 || j < 0 || i >= size || j >= size) {
         return;
     }
     arena[i][j] = 1;
@@ -131,10 +175,18 @@ function fill_rec(i, j, n) {
     }
 }
 
+/**
+ * Returns a random int beetween 0 and max
+ * @param {*} max 
+ */
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 
+/**
+ * Create nb cells randomly
+ * @param {number of total cells} nb 
+ */
 function fill(nb) {
     var i = 0;
     while (i < nb) {
