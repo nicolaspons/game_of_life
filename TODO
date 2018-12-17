@@ -1,3 +1,5 @@
-- use requestAnimationFrame(update) inside the update function
+- use requestAnimationFrame(update) inside the update function			OK
 to notify the web browser that I'll execute an animation
-- use for example "height: 90vh" to resize the canvas
+- use for example "height: 90vh" to resize the canvas		
+- add comments
+- improve the display
