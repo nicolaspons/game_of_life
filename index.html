@@ -12,10 +12,32 @@
 
 <body>
     <div id="steps"></div>
-    <canvas id="canvas" width="400" height="400">
+    <div id="container">
+        <canvas id="canvas" width="400" height="400">
         Canvas not supported.
     </canvas>
+    </div>
+    <div id="btn">
+        <button id="start">start</button>
+        <button id="resume"><div id="stop">stop</div></button>
+        <button id="reduce">-</button>
+        <button id="increase">+</button>
+    </div>
+    <div id="btn-example">
+        <button id="spaceships">spaceships</button>
+    </div>
     <script src="gameoflife.js"></script>
+    <script type="text/javascript">
+        document.getElementById("start").addEventListener("click", start, false);
+        document.getElementById("resume").addEventListener("click", resume, false);
+        document.getElementById("reduce").addEventListener("click", function() {
+            modifySpeed(0)
+        }, false);
+        document.getElementById("increase").addEventListener("click", function() {
+            modifySpeed(1)
+        }, false);
+        document.getElementById("spaceships").addEventListener("click", spaceships, false);
+    </script>
 </body>
 
 </html>
