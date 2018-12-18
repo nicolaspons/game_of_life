@@ -1,9 +1,9 @@
 canvas {
-    border: 5px solid black;
-    background-size: 100%;
+    border: solid.2em #000;
+    height: 70vh;
 }
 
-#body {
+body {
     background: #202028;
     color: #fff;
     font-family: sans-serif;
