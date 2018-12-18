@@ -1,8 +1,14 @@
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
+// Display the game's name
+context.font = "6px Arial";
+context.textAlign = "center";
+context.fillStyle = "white";
+context.fillText("Game Of Life", size / 2, size / 2);
 const scale = 5
 const size = canvas.width / scale
 
+let is_playing = 1;
 let steps = 0;
 let nb_of_cells = 10;
 const nb_of_oc = 10;
@@ -14,6 +20,7 @@ context.scale(scale, scale);
  */
 function gameReset() {
     arena = createMatrix(size, size);
+    steps = 0;
     fill(nb_of_cells);
 }
 
@@ -124,15 +131,17 @@ let lastTime = 0;
  * Update the game every second
  */
 function update(time = 0) {
-    const deltaTime = time - lastTime;
-    lastTime = time;
-    dropCounter += deltaTime;
-    if (dropCounter > dropInterval) {
-        gameDrop();
-        draw();
-        dropCounter = 0;
+    if (is_playing) {
+        const deltaTime = time - lastTime;
+        lastTime = time;
+        dropCounter += deltaTime;
+        if (dropCounter > dropInterval) {
+            gameDrop();
+            draw();
+            dropCounter = 0;
+        }
+        requestAnimationFrame(update);
     }
-    requestAnimationFrame(update);
 }
 
 /**
@@ -195,5 +204,54 @@ function fill(nb) {
     }
 }
 
-gameReset();
-update();
+/**
+ * Stop or resume the game
+ */
+function resume() {
+    if (is_playing) {
+        is_playing = 0;
+        document.getElementById('stop').innerHTML = 'resume';
+    } else {
+        is_playing = 1;
+        document.getElementById('stop').innerHTML = 'stop';
+    }
+    update();
+}
+
+/**
+ * Modify the current step's speed
+ * @param {Int which corresponds to an incrementing or a reducing } x 
+ */
+function modifySpeed(x) {
+    dropInterval += x > 0 ? -500 : 500;
+    console.log(x)
+}
+
+/**
+ * Start the game
+ */
+function start() {
+    gameReset();
+    update();
+}
+
+/**
+ * Create 4 spaceships instead of random cells
+ */
+function spaceships() {
+    arena = createMatrix(size, size);
+    steps = 0;
+
+    for (let y = 0; y < 4; ++y) {
+        arena[2 + y * size / 4][size - 2] = 1;
+        arena[4 + y * size / 4][size - 2] = 1;
+        arena[5 + y * size / 4][size - 3] = 1;
+        arena[5 + y * size / 4][size - 4] = 1;
+        arena[5 + y * size / 4][size - 5] = 1;
+        arena[5 + y * size / 4][size - 6] = 1;
+        arena[4 + y * size / 4][size - 6] = 1;
+        arena[3 + y * size / 4][size - 6] = 1;
+        arena[2 + y * size / 4][size - 5] = 1;
+    }
+    update();
+}
