@@ -4,9 +4,9 @@ const context = canvas.getContext('2d');
 context.font = "6px Arial";
 context.textAlign = "center";
 context.fillStyle = "white";
+const scale = 5;
+const size = canvas.width / scale;
 context.fillText("Game Of Life", size / 2, size / 2);
-const scale = 5
-const size = canvas.width / scale
 
 let is_playing = 1;
 let steps = 0;
